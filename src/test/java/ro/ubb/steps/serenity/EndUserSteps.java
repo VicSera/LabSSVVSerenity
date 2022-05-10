@@ -1,40 +1,47 @@
 package ro.ubb.steps.serenity;
 
-import ro.ubb.pages.DictionaryPage;
+import net.serenitybdd.core.pages.WebElementFacade;
 import net.thucydides.core.annotations.Step;
-import net.thucydides.core.steps.ScenarioSteps;
+import org.junit.Assert;
+import org.openqa.selenium.By;
+import ro.ubb.pages.EmagHomePage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
 
 public class EndUserSteps {
 
-    DictionaryPage dictionaryPage;
+    EmagHomePage emagHomePage;
 
     @Step
-    public void enters(String keyword) {
-        dictionaryPage.enter_keywords(keyword);
+    public void opensThePage() {
+        emagHomePage.open();
     }
 
     @Step
-    public void starts_search() {
-        dictionaryPage.lookup_terms();
+    public void searches(String searchString) {
+        emagHomePage.executeSearch(searchString);
     }
 
     @Step
-    public void should_see_definition(String definition) {
-        assertThat(dictionaryPage.getDefinitions(), hasItem(containsString(definition)));
+    public void shouldSeeProduct(String productName) {
+        WebElementFacade div = emagHomePage.find(By.xpath(String.format(".//div[@data-name=\"%s\"]", productName)));
+
+        assertThat(String.format("End user should see product %s", productName), div.isVisible());
     }
 
     @Step
-    public void is_the_home_page() {
-        dictionaryPage.open();
+    public void selects(String productName) {
+        WebElementFacade div = emagHomePage.find(By.xpath(String.format(".//div[@data-name=\"%s\"]", productName)));
+
+        div.click();
     }
 
     @Step
-    public void looks_for(String term) {
-        enters(term);
-        starts_search();
+    public void shouldSeeAddToCartButton() {
+        try {
+            emagHomePage.waitForTextToAppear("Adauga in Cos", 5000L);
+        } catch (Exception exception) {
+            Assert.fail("Add to cart button did not appear");
+        }
     }
 }
