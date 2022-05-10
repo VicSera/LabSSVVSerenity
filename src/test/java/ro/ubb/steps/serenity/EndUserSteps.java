@@ -6,6 +6,8 @@ import org.junit.Assert;
 import org.openqa.selenium.By;
 import ro.ubb.pages.EmagHomePage;
 
+import java.time.Duration;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class EndUserSteps {
@@ -39,7 +41,12 @@ public class EndUserSteps {
     @Step
     public void shouldSeeAddToCartButton() {
         try {
-            emagHomePage.waitForTextToAppear("Adauga in Cos", 5000L);
+            WebElementFacade div = emagHomePage.withTimeoutOf(Duration.ofSeconds(5))
+                    .find(".//div/button[text() =\"Adauga in Cos\"]");
+
+            if (div == null)
+                Assert.fail();
+
         } catch (Exception exception) {
             Assert.fail("Add to cart button did not appear");
         }
